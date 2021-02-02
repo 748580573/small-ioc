@@ -6,6 +6,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.dom4j.tree.DefaultElement;
+import org.dom4j.tree.DefaultText;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,6 +32,8 @@ public class BeanConfigParser {
                     BeanDefinition beanDefinition = new BeanDefinitionImpl();
                     //设置BeanDefinition的名字
                     setBeanClassName(beanDefinition,element);
+                    //设置BeanDefinition的构造参数
+                    setBeanConstruct(beanDefinition,element);
                     //设置BeanDefinition的成员变量
                     setBeanAttribute(beanDefinition,element);
                     list.add(beanDefinition);
@@ -37,10 +41,17 @@ public class BeanConfigParser {
             }
         } catch (DocumentException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
 
+    /**
+     * 获取bean的类名与id
+     * @param beanDefinition
+     * @param element
+     */
     private void setBeanClassName(BeanDefinition beanDefinition,Element element){
         String beanID = element.attributeValue("id");
         String beanClassName = element.attributeValue("class");
@@ -48,11 +59,46 @@ public class BeanConfigParser {
         beanDefinition.setBeanClassName(beanClassName);
     }
 
-    private void setBeanAttribute(BeanDefinition beanAttribute,Element element){
+    /**
+     * 获取bean的构造参数
+     * @param beanDefinition
+     * @param element
+     */
+    private void setBeanConstruct(BeanDefinition beanDefinition,Element element) throws Exception {
+        for (Iterator<Element> it = element.elementIterator();it.hasNext();){
+            Element el = it.next();
+            if (el.getQName().getName().equals("constructor-arg")){
+                if (el.attributeValue("index") == null){
+                    throw new IllegalArgumentException("construct-arg must specify value,for example:" + "   <constructor-arg index=\"0\">");
+                }
+
+                Integer index = Integer.valueOf(el.attributeValue("index"));   //手动指定的index
+
+                if (index < 0){
+                    throw new Exception("construct-arg index can't less than 0");
+                }
+
+                for (Iterator<Element> vals = el.elementIterator();vals.hasNext();){
+                     Element val = vals.next();
+                     if (val.getQName().getName().equals("value")){
+                         beanDefinition.setConstructArg(index,val.getText().trim());
+                     }
+                 }
+
+            }
+        }
+    }
+
+    /**
+     * 获取bean的属性
+     * @param beanDefinition
+     * @param element
+     */
+    private void setBeanAttribute(BeanDefinition beanDefinition,Element element){
         for (Iterator<Element> it = element.elementIterator();it.hasNext();){
             Element el = it.next();
             if (el.getQName().getName().equals("property")){
-                beanAttribute.setAttribute(el.attributeValue("name"),el.attributeValue("value"));
+                beanDefinition.setAttribute(el.attributeValue("name"),el.attributeValue("value"));
             }
         }
     }

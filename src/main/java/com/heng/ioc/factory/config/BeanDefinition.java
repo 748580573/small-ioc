@@ -4,6 +4,12 @@ import java.util.List;
 
 public interface BeanDefinition {
 
+    void setConstructArg(int index,Object object);
+
+    Object getConstructArg(int index);
+
+    int getConstructArgCounts();
+
     void setAttribute(String name,Object value);
 
     Object getAttribute(String name);

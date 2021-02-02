@@ -3,7 +3,9 @@ package com.heng.ioc.factory;
 import com.heng.ioc.factory.config.BeanDefinition;
 import com.heng.ioc.utils.TypeConvertUtils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,23 +16,37 @@ public class BeanFactory {
 
     public void addBeanDefinitions(List<BeanDefinition> beanDefinitions){
         for (BeanDefinition beanDefinition : beanDefinitions){
-            String beanClassName = beanDefinition.getBeanClassName();
-            Object object = initClassObject(beanClassName);
+            Object object = initClassObject(beanDefinition);
             initObjectAttribute(object,beanDefinition);
             beanMap.put(beanDefinition.getBeanId(),object);
         }
     }
 
-    private Object initClassObject(String beanClassName){
+    private Object initClassObject(BeanDefinition beanDefinition){
         try {
-            Class<?> clazz = Class.forName(beanClassName);
-            Object object = clazz.newInstance();
-            return object;
+            Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
+            Constructor<?>[] constructors = clazz.getConstructors();
+            if (constructors.length == 1){
+                return constructors[0].newInstance();
+            }
+            for (Constructor constructor : constructors){
+                if (constructor.getParameterCount() == beanDefinition.getConstructArgCounts()){
+                    Object[] args = new Object[beanDefinition.getConstructArgCounts()];
+                    for (int i = 0;i < args.length;i++){
+
+                        args[i] = TypeConvertUtils.typeConvert(beanDefinition.getConstructArg(i).toString(),constructor.getParameterTypes()[i]);
+                    }
+                    return constructor.newInstance(args);
+                }
+            }
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
