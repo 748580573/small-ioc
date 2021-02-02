@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>  <!-- 文档头，定义编码格式和xml标准版本 -->
+<!DOCTYPE beans>    <!-- 文档类型定义，demo表示这个xml文档的根节点标签的元素名，
+                       一般还会在这里定义dtd文件，可以用来检验文档格式 -->
+<!-- xml严格要求有开标签必须有闭标签 -->
+<beans>
+    <bean id="people" class="com.heng.ioc.bean.People">
+        <property name="age"  value="100"/>
+        <property name="name" value="hw"/>
+    </bean>
+
+    <bean id="hand" class="com.heng.ioc.bean.Hand">
+
+    </bean>
+</beans>
