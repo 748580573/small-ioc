@@ -1,7 +1,9 @@
 package com.heng.ioc.factory;
 
 import com.heng.ioc.factory.config.BeanDefinition;
+import com.heng.ioc.utils.TypeConvertUtils;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ public class BeanFactory {
         for (BeanDefinition beanDefinition : beanDefinitions){
             String beanClassName = beanDefinition.getBeanClassName();
             Object object = initClassObject(beanClassName);
+            initObjectAttribute(object,beanDefinition);
             beanMap.put(beanDefinition.getBeanId(),object);
         }
     }
@@ -29,6 +32,22 @@ public class BeanFactory {
             e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Object initObjectAttribute(Object object,BeanDefinition beanDefinition){
+        Class<?> clazz = object.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields){
+            field.setAccessible(true);
+            if (beanDefinition.getAttribute(field.getName()) != null){
+                try {
+                    field.set(object, TypeConvertUtils.typeConvert(beanDefinition.getAttribute(field.getName()).toString(),field.getType()));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return null;
     }

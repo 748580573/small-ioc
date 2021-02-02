@@ -27,11 +27,11 @@ public class BeanConfigParser {
             for (Iterator<Element> it = root.elementIterator(); it.hasNext(); ){
                 Element element = it.next();
                 if (element.getQName().getName().equals("bean")){
-                    String beanID = element.attributeValue("id");
-                    String beanClassName = element.attributeValue("class");
                     BeanDefinition beanDefinition = new BeanDefinitionImpl();
-                    beanDefinition.setBeanId(beanID);
-                    beanDefinition.setBeanClassName(beanClassName);
+                    //设置BeanDefinition的名字
+                    setBeanClassName(beanDefinition,element);
+                    //设置BeanDefinition的成员变量
+                    setBeanAttribute(beanDefinition,element);
                     list.add(beanDefinition);
                 }
             }
@@ -39,5 +39,21 @@ public class BeanConfigParser {
             e.printStackTrace();
         }
         return list;
+    }
+
+    private void setBeanClassName(BeanDefinition beanDefinition,Element element){
+        String beanID = element.attributeValue("id");
+        String beanClassName = element.attributeValue("class");
+        beanDefinition.setBeanId(beanID);
+        beanDefinition.setBeanClassName(beanClassName);
+    }
+
+    private void setBeanAttribute(BeanDefinition beanAttribute,Element element){
+        for (Iterator<Element> it = element.elementIterator();it.hasNext();){
+            Element el = it.next();
+            if (el.getQName().getName().equals("property")){
+                beanAttribute.setAttribute(el.attributeValue("name"),el.attributeValue("value"));
+            }
+        }
     }
 }
