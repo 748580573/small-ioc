@@ -4,19 +4,13 @@
 <!-- xml严格要求有开标签必须有闭标签 -->
 <beans>
     <bean id="people" class="com.heng.ioc.bean.People">
-        <constructor-arg index="0">
-            <value>hw</value>
-        </constructor-arg>
-        <constructor-arg index="1">
-            <value>
-                1
-            </value>
-        </constructor-arg>
-<!--        <property name="age"  value="100"/>-->
-<!--        <property name="name" value="hw"/>-->
+        <property name="age"  value="100"/>
+        <property name="name" value="hw"/>
+        <property name="hand" ref="hand"/>
     </bean>
 
     <bean id="hand" class="com.heng.ioc.bean.Hand">
+        <property name="people" ref="people"/>
 
     </bean>
 </beans>

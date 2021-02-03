@@ -2,6 +2,8 @@ package com.heng.ioc.bean;
 
 public class People {
 
+    private Hand hand;
+
     private String name;
 
     private int age;
@@ -29,5 +31,13 @@ public class People {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public Hand getHand() {
+        return hand;
+    }
+
+    public void setHand(Hand hand) {
+        this.hand = hand;
     }
 }

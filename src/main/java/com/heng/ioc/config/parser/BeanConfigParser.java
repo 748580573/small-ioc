@@ -97,8 +97,10 @@ public class BeanConfigParser {
     private void setBeanAttribute(BeanDefinition beanDefinition,Element element){
         for (Iterator<Element> it = element.elementIterator();it.hasNext();){
             Element el = it.next();
-            if (el.getQName().getName().equals("property")){
+            if (el.getQName().getName().equals("property") && el.attributeValue("value") != null){
                 beanDefinition.setAttribute(el.attributeValue("name"),el.attributeValue("value"));
+            }else {
+                beanDefinition.setAttribute(el.attributeValue("name"),el.attributeValue("ref"));
             }
         }
     }
